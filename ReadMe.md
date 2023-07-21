@@ -31,6 +31,7 @@ There is a player data property called "geoPool", and one called "geo". "geoPool
 ## Credits
 - [**TheMulhima on GitHub**](https://github.com/TheMulhima)  
   I borrowed the code from [DebugMod](https://github.com/TheMulhima/HollowKnight.DebugMod) which recovers your shade, and used it to do the same in this mod.  
+  This readme file is heavily inspired by the very well-organized readme file from the mod [AdditionalChallenge.](https://github.com/TheMulhima/AdditionalChallenge)  
   I also extensively relied on this [fantastic documentation](https://prashantmohta.github.io/ModdingDocs/) for Hollow Knight modding beginners, which I believe TheMulhima also created.
 - [**ygsbzr on Github**](https://github.com/ygsbzr)  
   I got my foothold in creating menus with Satchel by borrowing the code used for the menu in the [EnemyHPBars](https://github.com/ygsbzr/Enemy-HP-Bars) mod.
