@@ -13,51 +13,52 @@ namespace KeepMeGeo
     public class KeepMeGeo : Mod, ICustomMenuMod, ITogglableMod, IGlobalSettings<Settings>
     {
         public bool ToggleButtonInsideMenu { get; } = true;
-
-        public static Settings globalSettings = new();
-
+        internal static Settings globalSettings = new();
         public void OnLoadGlobal(Settings settings) => globalSettings = settings;
-
-        public Settings OnSaveGlobal()
-        {
-            return globalSettings;
-        }
-
+        public Settings OnSaveGlobal() => globalSettings;
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggle) => SettingsMenu.GetMenu(modListMenu, toggle);
-
         new public string GetName() => "Keep Me Geo";
         public override string GetVersion() => "3.2.1";
-        public override void Initialize()
-        {
-            ModHooks.AfterPlayerDeadHook += RecoverGeo;
-        }
+        public override void Initialize() => ModHooks.AfterPlayerDeadHook += RecoverGeo;
+        public void Unload() => ModHooks.AfterPlayerDeadHook -= RecoverGeo;
 
-        public void RecoverGeo()
+        private void RecoverGeo()
         {
-            PlayerData.instance.AddGeo(PlayerData.instance.geoPool);
-            PlayerData.instance.geoPool = 0;
+            int recoveredGeo;
+            int lostGeo;
+            if (globalSettings.geoRecoveryPercentage == 0f)
+            {
+                recoveredGeo = 0;
+                lostGeo = PlayerData.instance.geoPool;
+            }
+            if (globalSettings.geoRecoveryPercentage == 100f)
+            {
+                recoveredGeo = PlayerData.instance.geoPool;
+                lostGeo = 0;
+            } else
+            {
+                recoveredGeo = (int) Math.Round((double) PlayerData.instance.geoPool * (double) (globalSettings.geoRecoveryPercentage / 100f));
+                lostGeo = PlayerData.instance.geoPool - recoveredGeo;
+            }
+            PlayerData.instance.AddGeo(recoveredGeo);
+            PlayerData.instance.geoPool = lostGeo;
             if (!globalSettings.doSpawnShades)
-            {
                 RecoverShade();
-            }
         }
 
-        public void RecoverShade()
+        private void RecoverShade()
         {
-            PlayerData.instance.EndSoulLimiter();
             PlayerData.instance.shadeScene = "None";
-            foreach (PlayMakerFSM fsm in GameCameras.instance.hudCanvas.transform.Find("Soul Orb")
-                .GetComponentsInChildren<PlayMakerFSM>())
-            {
-                fsm.SendEvent("SOUL LIMITER DOWN");
-            }
-
             PlayMakerFSM.BroadcastEvent("HOLLOW SHADE KILLED");
+            RemoveSoulLimit();
         }
     
-        public void Unload()
+        private void RemoveSoulLimit()
         {
-            ModHooks.AfterPlayerDeadHook -= RecoverGeo;
+            PlayerData.instance.EndSoulLimiter();
+            foreach (PlayMakerFSM fsm in GameCameras.instance.hudCanvas.transform.Find("Soul Orb")
+                .GetComponentsInChildren<PlayMakerFSM>())
+                fsm.SendEvent("SOUL LIMITER DOWN");
         }
     }
 }
