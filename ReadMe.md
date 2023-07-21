@@ -10,11 +10,11 @@ There is a player data property called "geoPool", and one called "geo". "geoPool
 ## Available Options
 
 #### The following settings can be changed:
-- **Mod toggle**  
+- **Mod Toggle**  
   Enable or disable the mod.
-- **Spawn shades**  
+- **Spawn Shades**  
   Toggle whether or not shades spawn when you die.
-- **Percent of geo kept**  
+- **Percent of Geo Kept**  
   Specify the percent of your geo that you want to keep when you die (the rest stays on your shade).
 
 #### The following safeguards are in place:
