@@ -18,7 +18,7 @@ namespace KeepMeGeo
         public Settings OnSaveGlobal() => globalSettings;
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggle) => SettingsMenu.GetMenu(modListMenu, toggle);
         new public string GetName() => "Keep Me Geo";
-        public override string GetVersion() => "3.2.1";
+        public override string GetVersion() => "1.0.0.0";
         public override void Initialize() => ModHooks.AfterPlayerDeadHook += RecoverGeo;
         public void Unload() => ModHooks.AfterPlayerDeadHook -= RecoverGeo;
 
