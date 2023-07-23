@@ -25,9 +25,9 @@ namespace KeepMeGeo
             ModHooks.HeroUpdateHook += SpawnShade;
         }
         public void Unload() => ModHooks.AfterPlayerDeadHook -= RecoverGeo;
-
         private void RecoverGeo()
         {
+            globalSettings.hasDied = true;
             int recoveredGeo;
             int lostGeo;
             if (globalSettings.geoRecoveryPercentage == 0f)
@@ -71,8 +71,19 @@ namespace KeepMeGeo
         private void SpawnShade()
         {
             if (globalSettings.doSpawnShades)
-                if (GameObject.Find("Hollow Shade(Clone)") == null && string.Equals(PlayerData.instance.GetString(nameof(PlayerData.instance.shadeScene)), UnityEngine.SceneManagement.SceneManager.GetActiveScene().name) && !HeroController.instance.controlReqlinquished)
-                    GameObject.Instantiate(GameManager.instance.sm.hollowShadeObject, new Vector3(PlayerData.instance.GetFloat(nameof(PlayerData.instance.shadePositionX)), PlayerData.instance.GetFloat(nameof(PlayerData.instance.shadePositionY))), Quaternion.identity);
+            {
+                if (globalSettings.hasDied == null)
+                    globalSettings.hasDied = (PlayerData.instance.shadeScene == "None") ? false : true;
+
+                if (GameObject.Find("Hollow Shade(Clone)") == null && string.Equals
+                    (PlayerData.instance.GetString(nameof(PlayerData.instance.shadeScene)), UnityEngine.SceneManagement.SceneManager.GetActiveScene().name) &&
+                    (bool) globalSettings.hasDied)
+                {
+                    GameObject.Instantiate(GameManager.instance.sm.hollowShadeObject, new Vector3(PlayerData.instance.GetFloat(nameof(PlayerData.instance.shadePositionX)),
+                                           PlayerData.instance.GetFloat(nameof(PlayerData.instance.shadePositionY))), Quaternion.identity);
+                    globalSettings.hasDied = false;
+                }
+            }
         }
     }
 }
