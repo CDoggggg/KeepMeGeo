@@ -8,6 +8,7 @@ using IL;
 using JetBrains.Annotations;
 using Modding;
 using On;
+using On.HutongGames.PlayMaker.Actions;
 using Satchel;
 using UnityEngine;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
@@ -26,7 +27,7 @@ namespace KeepMeGeo
         public override string GetVersion() => "1.0.0.0";
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
-            var shadeMapPrefab = preloadedObjects["_GameCameras"]["HudCamera/Game_Map(Clone)/Shade Pos"];
+            var shadeMapPrefab = preloadedObjects["DontDestroyOnLoad"]["_GameCameras / HudCamera / Game_Map(Clone) / Shade Pos"];
             UnityEngine.Object.DontDestroyOnLoad(shadeMapPrefab);
             shadeMapPrefab.LocateMyFSM("Deactivate if !SoulLimited").RemoveAction("DEACTIVATE", 0);
 
