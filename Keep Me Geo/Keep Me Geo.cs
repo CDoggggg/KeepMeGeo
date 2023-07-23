@@ -19,7 +19,11 @@ namespace KeepMeGeo
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggle) => SettingsMenu.GetMenu(modListMenu, toggle);
         new public string GetName() => "Keep Me Geo";
         public override string GetVersion() => "1.0.0.0";
-        public override void Initialize() => ModHooks.AfterPlayerDeadHook += RecoverGeo;
+        public override void Initialize()
+        {
+            ModHooks.AfterPlayerDeadHook += RecoverGeo;
+            ModHooks.HeroUpdateHook += SpawnShade;
+        }
         public void Unload() => ModHooks.AfterPlayerDeadHook -= RecoverGeo;
 
         private void RecoverGeo()
@@ -62,7 +66,10 @@ namespace KeepMeGeo
             foreach (PlayMakerFSM fsm in GameCameras.instance.hudCanvas.transform.Find("Soul Orb")
                 .GetComponentsInChildren<PlayMakerFSM>())
                 fsm.SendEvent("SOUL LIMITER DOWN");
-            
+        }
+
+        private void SpawnShade()
+        {
             if (globalSettings.doSpawnShades)
                 if (GameObject.Find("Hollow Shade(Clone)") == null && string.Equals(PlayerData.instance.GetString(nameof(PlayerData.instance.shadeScene)), UnityEngine.SceneManagement.SceneManager.GetActiveScene().name))
                     GameObject.Instantiate(GameManager.instance.sm.hollowShadeObject, new Vector3(PlayerData.instance.GetFloat(nameof(PlayerData.instance.shadePositionX)), PlayerData.instance.GetFloat(nameof(PlayerData.instance.shadePositionY))), Quaternion.identity);
