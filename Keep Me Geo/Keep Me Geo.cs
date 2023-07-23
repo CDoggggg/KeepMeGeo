@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using HutongGames.PlayMaker;
+using HutongGames.PlayMaker.Actions;
 using IL;
 using JetBrains.Annotations;
 using Modding;
 using On;
+using Satchel;
 using UnityEngine;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
 
@@ -14,6 +16,7 @@ namespace KeepMeGeo
 {
     public class KeepMeGeo : Mod, ICustomMenuMod, ITogglableMod, IGlobalSettings<Settings>
     {
+        private GameObject shadeMapPrefab;
         public bool ToggleButtonInsideMenu { get; } = true;
         internal static Settings globalSettings = new();
         public void OnLoadGlobal(Settings settings) => globalSettings = settings;
@@ -21,12 +24,23 @@ namespace KeepMeGeo
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggle) => SettingsMenu.GetMenu(modListMenu, toggle);
         new public string GetName() => "Keep Me Geo";
         public override string GetVersion() => "1.0.0.0";
-        public override void Initialize()
+        public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
+            var shadeMapPrefab = preloadedObjects["_GameCameras"]["HudCamera/Game_Map(Clone)/Shade Pos"];
+            shadeMapPrefab.LocateMyFSM("Deactivate if !SoulLimited").RemoveAction("DEACTIVATE", 0);
+
+            UnityEngine.Object.DontDestroyOnLoad(shadeMapPrefab);
             ModHooks.AfterPlayerDeadHook += RecoverGeo;
             ModHooks.HeroUpdateHook += SpawnShade;
         }
         public void Unload() => ModHooks.AfterPlayerDeadHook -= RecoverGeo;
+        public override List<(string, string)> GetPreloadNames()
+        {
+            return new List<(string, string)>
+            {
+                ("_GameCameras", "HudCamera/Game_Map(Clone)/Shade Pos")
+            };
+        }
         private void RecoverGeo()
         {
             globalSettings.hasDied = true;
@@ -59,6 +73,7 @@ namespace KeepMeGeo
         {
             PlayerData.instance.shadeScene = "None";
             PlayMakerFSM.BroadcastEvent("HOLLOW SHADE KILLED");
+            shadeMapPrefab.SetActive(false);
             RemoveSoulLimit();
         }
     
@@ -73,12 +88,14 @@ namespace KeepMeGeo
         private void SpawnShade()
         {
             if (globalSettings.doSpawnShades)
-            {
-                GameObject.Find("Shade Pos").SetActive(true);
+            {   
                 if (globalSettings.hasDied == null)
                     globalSettings.hasDied = (PlayerData.instance.shadeScene == "None") ? false : true;
                 else if (PlayerData.instance.shadeScene == "None")
                     globalSettings.hasDied = false;
+
+                if ((bool) globalSettings.hasDied && !shadeMapPrefab.activeSelf)
+                    shadeMapPrefab.SetActive(true);
 
                 if (GameObject.Find("Hollow Shade(Clone)") == null && string.Equals
                     (PlayerData.instance.GetString(nameof(PlayerData.instance.shadeScene)), UnityEngine.SceneManagement.SceneManager.GetActiveScene().name) &&
