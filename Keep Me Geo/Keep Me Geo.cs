@@ -25,23 +25,15 @@ namespace KeepMeGeo
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggle) => SettingsMenu.GetMenu(modListMenu, toggle);
         new public string GetName() => "Keep Me Geo";
         public override string GetVersion() => "1.0.0.0";
-        public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
+        public override void Initialize()
         {
-            var shadeMapPrefab = preloadedObjects["DontDestroyOnLoad"]["_GameCameras/HudCamera/Game_Map(Clone)/Shade Pos"];
-            UnityEngine.Object.DontDestroyOnLoad(shadeMapPrefab);
+            shadeMapPrefab = SceneUtils.GetDontDestroyOnLoadScene().GetGameObjectByName("_GameCameras").FindGameObjectInChildren("HudCamera").FindGameObjectInChildren("Game_Map(Clone)").FindGameObjectInChildren("Shade Pos");
             shadeMapPrefab.LocateMyFSM("Deactivate if !SoulLimited").RemoveAction("DEACTIVATE", 0);
 
             ModHooks.AfterPlayerDeadHook += RecoverGeo;
             ModHooks.HeroUpdateHook += SpawnShade;
         }
         public void Unload() => ModHooks.AfterPlayerDeadHook -= RecoverGeo;
-        public override List<(string, string)> GetPreloadNames()
-        {
-            return new List<(string, string)>
-            {
-                ("DontDestroyOnLoad", "_GameCameras/HudCamera/Game_Map(Clone)/Shade Pos")
-            };
-        }
         private void RecoverGeo()
         {
             globalSettings.hasDied = true;
