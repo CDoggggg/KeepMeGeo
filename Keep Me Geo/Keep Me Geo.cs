@@ -27,9 +27,9 @@ namespace KeepMeGeo
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             var shadeMapPrefab = preloadedObjects["_GameCameras"]["HudCamera/Game_Map(Clone)/Shade Pos"];
+            UnityEngine.Object.DontDestroyOnLoad(shadeMapPrefab);
             shadeMapPrefab.LocateMyFSM("Deactivate if !SoulLimited").RemoveAction("DEACTIVATE", 0);
 
-            UnityEngine.Object.DontDestroyOnLoad(shadeMapPrefab);
             ModHooks.AfterPlayerDeadHook += RecoverGeo;
             ModHooks.HeroUpdateHook += SpawnShade;
         }
@@ -38,7 +38,7 @@ namespace KeepMeGeo
         {
             return new List<(string, string)>
             {
-                ("_GameCameras", "HudCamera/Game_Map(Clone)/Shade Pos")
+                ("DontDestroyOnLoad", "_GameCameras/HudCamera/Game_Map(Clone)/Shade Pos")
             };
         }
         private void RecoverGeo()
