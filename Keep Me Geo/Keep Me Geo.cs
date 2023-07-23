@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using HutongGames.PlayMaker;
+using IL;
 using JetBrains.Annotations;
 using Modding;
+using On;
 using UnityEngine;
 using static System.Runtime.CompilerServices.RuntimeHelpers;
 
@@ -72,6 +74,7 @@ namespace KeepMeGeo
         {
             if (globalSettings.doSpawnShades)
             {
+                GameObject.Find("Shade Pos").SetActive(true);
                 if (globalSettings.hasDied == null)
                     globalSettings.hasDied = (PlayerData.instance.shadeScene == "None") ? false : true;
                 else if (PlayerData.instance.shadeScene == "None")
