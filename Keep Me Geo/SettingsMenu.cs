@@ -25,11 +25,19 @@ internal static class SettingsMenu
                     if (choice == false)
                     {
                         KeepMeGeo.globalSettings.geoRecoveryPercentage = 100f;
+                        KeepMeGeo.globalSettings.doRemoveSoulLimit = true;
                         MenuRef.Update();
                     }
                 },
                 () => KeepMeGeo.globalSettings.doSpawnShades,
                 Id: "DoSpawnShades"
+            ),
+            Blueprints.HorizontalBoolOption
+            (
+                "Remove Soul Limit", "Enable or disable the removal of the soul limit on death.",
+                (choice) => KeepMeGeo.globalSettings.doRemoveSoulLimit = choice,
+                () => KeepMeGeo.globalSettings.doRemoveSoulLimit,
+                Id: "DoRemoveSoulLimit"
             ),
             Blueprints.FloatInputField
             (
