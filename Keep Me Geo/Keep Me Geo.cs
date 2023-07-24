@@ -27,24 +27,26 @@ namespace KeepMeGeo
         public override string GetVersion() => "1.0.0.0";
         public override void Initialize()
         {
-            shadeMapPrefab = SceneUtils.GetDontDestroyOnLoadScene().GetGameObjectByName("_GameCameras").FindGameObjectInChildren("HudCamera").FindGameObjectInChildren("Game_Map(Clone)").FindGameObjectInChildren("Shade Pos");
-            shadeMapPrefab.LocateMyFSM("Deactivate if !SoulLimited").RemoveAction("DEACTIVATE", 0);
-
             ModHooks.AfterPlayerDeadHook += RecoverGeo;
             ModHooks.HeroUpdateHook += SpawnShade;
         }
-        public void Unload() => ModHooks.AfterPlayerDeadHook -= RecoverGeo;
+        public void Unload()
+        {
+            ModHooks.AfterPlayerDeadHook -= RecoverGeo;
+            ModHooks.HeroUpdateHook -= SpawnShade;
+            shadeMapPrefab.LocateMyFSM("Deactivate if !SoulLimited").enabled = true;
+        }
         private void RecoverGeo()
         {
             globalSettings.hasDied = true;
             int recoveredGeo;
             int lostGeo;
+
             if (globalSettings.geoRecoveryPercentage == 0f)
             {
                 recoveredGeo = 0;
                 lostGeo = PlayerData.instance.geoPool;
-            }
-            if (globalSettings.geoRecoveryPercentage == 100f)
+            } else if (globalSettings.geoRecoveryPercentage == 100f)
             {
                 recoveredGeo = PlayerData.instance.geoPool;
                 lostGeo = 0;
@@ -53,8 +55,10 @@ namespace KeepMeGeo
                 recoveredGeo = (int) Math.Round((double) PlayerData.instance.geoPool * (double) (globalSettings.geoRecoveryPercentage / 100f));
                 lostGeo = PlayerData.instance.geoPool - recoveredGeo;
             }
+
             PlayerData.instance.AddGeo(recoveredGeo);
             PlayerData.instance.geoPool = lostGeo;
+
             if (!globalSettings.doSpawnShades)
                 RecoverShade();
 
@@ -66,7 +70,6 @@ namespace KeepMeGeo
         {
             PlayerData.instance.shadeScene = "None";
             PlayMakerFSM.BroadcastEvent("HOLLOW SHADE KILLED");
-            shadeMapPrefab.SetActive(false);
             RemoveSoulLimit();
         }
     
@@ -80,22 +83,30 @@ namespace KeepMeGeo
 
         private void SpawnShade()
         {
+            if (shadeMapPrefab == null)
+            {
+                shadeMapPrefab = SceneUtils.GetDontDestroyOnLoadScene().GetGameObjectByName("_GameCameras").FindGameObjectInChildren("HudCamera").FindGameObjectInChildren("Game_Map(Clone)").FindGameObjectInChildren("Shade Pos");
+                shadeMapPrefab.LocateMyFSM("Deactivate if !SoulLimited").enabled = false;
+            }
+
             if (globalSettings.doSpawnShades)
             {   
                 if (globalSettings.hasDied == null)
                     globalSettings.hasDied = (PlayerData.instance.shadeScene == "None") ? false : true;
                 else if (PlayerData.instance.shadeScene == "None")
+                {
                     globalSettings.hasDied = false;
-
-                if ((bool) globalSettings.hasDied && !shadeMapPrefab.activeSelf)
-                    shadeMapPrefab.SetActive(true);
+                    if (shadeMapPrefab.activeSelf)
+                        shadeMapPrefab.SetActive(false);
+                }
 
                 if (GameObject.Find("Hollow Shade(Clone)") == null && string.Equals
                     (PlayerData.instance.GetString(nameof(PlayerData.instance.shadeScene)), UnityEngine.SceneManagement.SceneManager.GetActiveScene().name) &&
                     (bool) globalSettings.hasDied)
                     GameObject.Instantiate(GameManager.instance.sm.hollowShadeObject, new Vector3(PlayerData.instance.GetFloat(nameof(PlayerData.instance.shadePositionX)),
                                            PlayerData.instance.GetFloat(nameof(PlayerData.instance.shadePositionY))), Quaternion.identity);
-            }
+            } else if (shadeMapPrefab.activeSelf)
+                shadeMapPrefab.SetActive(false);
         }
     }
 }
