@@ -24,7 +24,7 @@ namespace KeepMeGeo
         public Settings OnSaveGlobal() => globalSettings;
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggle) => SettingsMenu.GetMenu(modListMenu, toggle);
         new public string GetName() => "Keep Me Geo";
-        public override string GetVersion() => "1.0.0.0";
+        public override string GetVersion() => "1.1.0.2";
         public override void Initialize()
         {
             ModHooks.AfterPlayerDeadHook += RecoverGeo;
@@ -42,6 +42,8 @@ namespace KeepMeGeo
             int recoveredGeo;
             int lostGeo;
 
+            globalSettings.geoRecoveryPercentage = (globalSettings.geoRecoveryPercentage > 100f) ? 100f : globalSettings.geoRecoveryPercentage;
+            globalSettings.geoRecoveryPercentage = (globalSettings.geoRecoveryPercentage < 0f) ? 0f : globalSettings.geoRecoveryPercentage;
             if (globalSettings.geoRecoveryPercentage == 0f)
             {
                 recoveredGeo = 0;
@@ -70,6 +72,9 @@ namespace KeepMeGeo
         {
             PlayerData.instance.shadeScene = "None";
             PlayMakerFSM.BroadcastEvent("HOLLOW SHADE KILLED");
+            if (!globalSettings.doRemoveSoulLimit)
+                globalSettings.doRemoveSoulLimit = true;
+
             RemoveSoulLimit();
         }
     
