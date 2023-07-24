@@ -19,7 +19,7 @@ There is a player data property called "geoPool", and one called "geo". "geoPool
 
 #### The following safeguards are in place:
 - **Permanent Geo Loss**  
-  The mod does not allow you to set the percent of geo kept after death to anything other than 100% if shade spawns are off, in order to prevent accidental permanent loss of geo.
+  The mod will directly warn you and ask for confirmation if you try to set the percent of geo kept after death to anything other than 100% while shade spawns are off, in order to prevent accidental permanent loss of geo.
 - **Making Geo out of Thin Air**  
   You cannot set the percent of geo kept after death to anything greater than 100%, and so you'll always have *at most* 100% of your geo when you die.
 - **Going into Debt**  
