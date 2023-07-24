@@ -14,7 +14,7 @@ There is a player data property called "geoPool", and one called "geo". "geoPool
   Enable or disable the mod.
 - **Spawn Shades**  
   Toggle whether or not shades spawn when you die.
-- **Remove Soul Limit**
+- **Remove Soul Limit**  
   Toggle whether or not the limit on the total amount of soul your vessel can hold to two-thirds of its original capacity after you die is removed.
 - **Percent of Geo Kept**  
   Specify the percent of your geo that you want to keep when you die (the rest stays on your shade).
